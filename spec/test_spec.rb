@@ -77,6 +77,7 @@ describe User do
 end
 
 # ネストしたdescribeやcontextの中でbeforeを使う
+# describeやcontextがネストしている場合には親子関係に応じてbeforeが順番に呼ばれる
 
 describe User do
   describe '#greet' do
@@ -96,10 +97,45 @@ describe User do
       before do
         @params.merge!(age: 13)
       end
-      it '感じで答えること' do
+      it '漢字で答えること' do
         user = User.new(@params)
         expect(user.greet).to eq '僕はたろうです。'
       end
     end
   end
 end
+
+# インスタンス変数のかわりにletを使う
+
+describe User do
+  describe '#greet' do
+    let(:params) { { name: 'たろう' } }
+    context '12際以下の場合' do
+      before do
+        params.merge!(age: 12)
+      end
+      it 'ひらがなで答えること' do
+        user = User.new(params)
+        expect(user.greet).to eq 'ぼくはたろうだよ。'
+      end
+    end
+    context '13歳以上の場合' do
+      before do
+        params.merge!(age: 13)
+      end
+      it '感じで答えること' do
+        user = User.new(params)
+        expect(user.greet).to eq '僕はたろうです。'
+      end
+    end
+  end
+end
+
+# let(:params) { { name } }の意味とは
+
+# let(:params) do
+#   hash = {}
+#   hash[:name] = "たろう"
+#   hash
+# end
+
